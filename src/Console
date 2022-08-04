@@ -1,0 +1,97 @@
+----
+Задание А продолжение 44
+
+insert into study.visits (id, visitor_id, date, trainer)
+VALUES (1,1,'2022-08-03 20:30:00.000000', 'Максим');
+
+insert into study.visitors (fullname, id, "dateOfBirth", gender)
+VALUES ('Ахтам' , 2 , '1997-09-16 21:40:00.000000', 'male' );
+
+insert into study.visits (id, visitor_id, date, trainer)
+VALUES (2,2,'2022-08-03 20:30:00.000000', 'Максим');
+
+insert into study.visits (id,visitor_id, date, trainer)
+VALUES (3,2,'2022-09-03 22:30:00.000000', 'Максим');
+
+
+select vv.fullname, v.trainer, v.date
+from study.visits v
+         inner join study.visitors vv on v.visitor_id = vv.id
+order by v.date
+ ------
+
+Задание Б
+
+create schema EX_b;
+
+
+create table ex_b.univer(
+    id serial primary key unique not null ,
+    name varchar not null
+);
+
+create table ex_b.fakultet (
+    id serial primary key unique not null ,
+    name varchar not null ,
+    univer_id int references ex_b.univer(id)
+);
+
+create table ex_b.subject (
+    id serial primary key unique not null,
+    name_subject varchar not null
+);
+
+create table ex_b.group(
+    id serial primary key unique not null,
+    fakultet_id int references ex_b.fakultet(id),
+    group_code varchar (50) not null
+);
+
+create table ex_b.student (
+    id serial primary key unique not null,
+    name varchar not null ,
+    group_id int references ex_b.group(id),
+    date date not null
+);
+
+create table ex_b.grade (
+    student_id int references ex_b.student(id),
+    grade numeric(5,0) not null,
+    subject_id int references ex_b.subject(id)
+
+);
+
+--Заполнить таблицы
+insert into ex_b.univer (name)
+values ('КГУСТА');
+
+insert into ex_b.fakultet (name, univer_id)
+values ('Архитектура',  1);
+
+insert into ex_b.subject (name_subject)
+values ('Архитектуралогия');
+
+insert into ex_b.group(fakultet_id, group_code)
+values (1,'Группа 312');
+
+insert into ex_b.student(name, group_id, date)
+values ('Ахтам','1','16.09.1997');
+insert into ex_b.student(name, group_id, date)
+values ('Айбек',1,'11.11.1998');
+
+insert into ex_b.grade (student_id, grade, subject_id)
+values (1,5,1);
+insert into ex_b.grade(student_id, grade, subject_id)
+VALUES (2,3,1);
+
+--Подсчитать среднее арифметическое всех оценок определенного студента.
+SELECT AVG(ex_b.grade.grade) as Средняя_Оценка
+FROM ex_b.grade where ex_b.grade.student_id = 1;
+
+---Вывести полную информацию по студенту – ФИО, Название Группы, Название Факультета, Название Университета
+
+select ex_b.student.name as Имя,
+       ex_b."group".group_code as Группа,
+       ex_b.fakultet.name as Факультет,
+       ex_b.univer.name as Универ
+from ex_b.student , ex_b."group"  , ex_b.univer, ex_b.fakultet;
